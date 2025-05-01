@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // 🟢 Inicia la simulación en intervalos
 function iniciarSimulacion() {
     if (!intervalId) {
-        intervalId = setInterval(ejecutarSimulacion, 10000); // cada 10s
+        intervalId = setInterval(ejecutarSimulacion, 60000); // cada 60s
         console.log("🟢 Simulación activada");
     }
 }

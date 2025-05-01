@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Simulador de Actividad",
+    "version": "1.0",
+    "description": "Simula actividad para evitar bloqueo de pantalla",
+    "permissions": [
+        "scripting",
+        "storage",
+        "tabs",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    }
+}

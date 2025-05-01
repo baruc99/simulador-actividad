@@ -1,5 +1,4 @@
-// TODO: Cambiar el color de fondo del popup cuando la simulación esté activa.
-// TODO: Cambiar el ícono de la extensión según estado (activo/inactivo).
+
 // TODO: Agregar opción para seleccionar el intervalo de simulación.
 // TODO: Mostrar alertas o confirmaciones al activar/desactivar la simulación.
 

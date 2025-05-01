@@ -1,34 +1,34 @@
-const btn = document.getElementById('toggleBtn');
-const status = document.getElementById('status');
+const btn = document.getElementById("toggleBtn");
+const status = document.getElementById("status");
+const popupBody = document.getElementById("popupBody");
 
-// Pedimos el estado actual al background
-chrome.runtime.sendMessage("estado", response => {
-    actualizarUI(response.activo);
+// Inicialización
+document.addEventListener("DOMContentLoaded", () => {
+    obtenerEstado().then(actualizarUI);
+    btn.addEventListener("click", manejarToggle);
 });
 
-// Alternar entre activar/desactivar
-btn.addEventListener("click", () => {
-    chrome.runtime.sendMessage(btn.dataset.active === "true" ? "desactivar" : "activar", () => {
-        chrome.runtime.sendMessage("estado", response => {
-            actualizarUI(response.activo);
-        });
+function manejarToggle() {
+    const activar = btn.dataset.active !== "true";
+    chrome.runtime.sendMessage(activar ? "activar" : "desactivar", () => {
+        obtenerEstado().then(actualizarUI);
     });
-});
+}
 
-// Actualizar el botón y el estado con estilos
+function obtenerEstado() {
+    return new Promise(resolve => {
+        chrome.runtime.sendMessage("estado", resolve);
+    });
+}
+
 function actualizarUI(activo) {
     btn.textContent = activo ? "Desactivar" : "Activar";
     btn.dataset.active = activo;
+    status.textContent = `Estado: ${activo ? "Activado" : "Desactivado"}`;
 
-    status.textContent = "Estado: " + (activo ? "Activado" : "Desactivado");
+    status.classList.toggle("estado-activo", activo);
+    status.classList.toggle("estado-inactivo", !activo);
 
-    if (activo) {
-        status.classList.remove("estado-inactivo");
-        status.classList.add("estado-activo");
-        btn.style.backgroundColor = "#f44336"; // Rojo al desactivar
-    } else {
-        status.classList.remove("estado-activo");
-        status.classList.add("estado-inactivo");
-        btn.style.backgroundColor = "#4CAF50"; // Verde al activar
-    }
+    btn.style.backgroundColor = activo ? "#f44336" : "#4CAF50";
+    popupBody.style.backgroundColor = activo ? "#fff3e0" : "#e8f5e9";
 }

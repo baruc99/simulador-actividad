@@ -1,7 +1,3 @@
-
-// TODO: Agregar opción para seleccionar el intervalo de simulación.
-// TODO: Mostrar alertas o confirmaciones al activar/desactivar la simulación.
-
 // TODO: Simular otras actividades como scroll o teclas presionadas.
 // TODO: Detectar inactividad del usuario antes de simular actividad.
 // TODO: Permitir simulación solo en pestañas específicas (por URL o título).

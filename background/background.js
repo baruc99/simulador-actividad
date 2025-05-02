@@ -27,10 +27,24 @@ function iniciarSimulacion() {
 }
 
 // 🔴 Detiene la simulación
-function detenerSimulacion() {
+async function detenerSimulacion() {
     clearInterval(intervalId);
     intervalId = null;
     console.log("🔴 Simulación desactivada");
+
+    // 🔻 Eliminar el cursor falso si existe
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                const cursor = document.getElementById('cursor-falso');
+                if (cursor) cursor.remove();
+            }
+        });
+    } catch (err) {
+        console.error("❌ No se pudo eliminar el cursor falso:", err);
+    }
 }
 
 // 🖱 Función que se ejecuta cada intervalo

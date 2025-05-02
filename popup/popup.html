@@ -5,7 +5,7 @@
     <title>Simulador</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="popup.css">
-   
+
 </head>
 
 <body id="popupBody">
@@ -19,6 +19,16 @@
         <option value="180000">3 minutos</option>
         <option value="300000">5 minutos</option>
     </select>
+
+    <label for="actividadSelect">Simulación:</label>
+    <select id="actividadSelect" class="margenes-select">
+        <option value="mouse">Mouse</option>
+        <option value="click">Clicks</option>
+        <option value="scroll">Scroll</option>
+        <option value="tecla">Teclas</option>
+        <option value="todas">Todas</option>
+    </select>
+
 
     <p id="status" class="estado-inactivo">Estado: Desactivado</p>
 

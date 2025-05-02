@@ -2,6 +2,11 @@ const btn = document.getElementById("toggleBtn");
 const status = document.getElementById("status");
 const popupBody = document.getElementById("popupBody");
 const intervalSelect = document.getElementById("intervalSelect");
+const actividadSelect = document.getElementById("actividadSelect");
+
+let simulacionIndex = 0;
+const tiposDisponibles = ["mouse", "scroll", "click", "tecla", "todas"];
+
 
 // Inicialización
 document.addEventListener("DOMContentLoaded", async () => {
@@ -11,6 +16,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Cargar intervalo actual desde storage
     chrome.storage.local.get("intervalo", (data) => {
         intervalSelect.value = data.intervalo || "60000"; // default: 60s
+    });
+
+    // Cargar tipo de simulación desde storage
+    chrome.storage.local.get("tipoSimulacion", (data) => {
+        actividadSelect.value = data.tipoSimulacion || "mouse"; // default: mouse
     });
 
     btn.addEventListener("click", manejarToggle);
@@ -29,6 +39,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
     });
+
+    // Cambio en tipo de simulación
+    actividadSelect.addEventListener("change", async () => {
+        const nuevoTipo = actividadSelect.value;
+        await chrome.storage.local.set({ tipoSimulacion: nuevoTipo });
+
+        const estado = await obtenerEstado();
+        if (estado.activo) {
+            chrome.runtime.sendMessage("desactivar", () => {
+                actualizarUI(false);
+                mostrarToast(`Simulación desactivada por cambio de tipo`);
+            });
+        }
+    });
 });
 
 function manejarToggle() {
@@ -40,7 +64,6 @@ function manejarToggle() {
         });
     });
 }
-
 
 function obtenerEstado() {
     return new Promise(resolve => {

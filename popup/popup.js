@@ -34,9 +34,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 function manejarToggle() {
     const activar = btn.dataset.active !== "true";
     chrome.runtime.sendMessage(activar ? "activar" : "desactivar", () => {
-        obtenerEstado().then(estado => actualizarUI(estado.activo));
+        obtenerEstado().then(estado => {
+            actualizarUI(estado.activo);
+            mostrarToast(`Simulación ${estado.activo ? "activada" : "desactivada"}`);
+        });
     });
 }
+
 
 function obtenerEstado() {
     return new Promise(resolve => {
@@ -45,6 +49,7 @@ function obtenerEstado() {
 }
 
 function actualizarUI(activo) {
+    console.log("Estado actualizado:", activo);
     btn.textContent = activo ? "Desactivar" : "Activar";
     btn.dataset.active = activo;
     status.textContent = `Estado: ${activo ? "Activado" : "Desactivado"}`;
@@ -54,4 +59,14 @@ function actualizarUI(activo) {
 
     btn.style.backgroundColor = activo ? "#f44336" : "#4CAF50";
     popupBody.style.backgroundColor = activo ? "#fff3e0" : "#e8f5e9";
+}
+
+function mostrarToast(mensaje) {
+    const toast = document.getElementById("toast");
+    toast.textContent = mensaje;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500); // 2.5 segundos visible
 }

@@ -60,6 +60,11 @@ async function ejecutarSimulacion() {
 
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
+        if (tipo === "click") {
+            abrirGoogleYSimular(tipo);
+            return;
+        }
+
         if (esURLValida(tab?.url)) {
             chrome.scripting.executeScript({
                 target: { tabId: tab.id },
@@ -104,6 +109,7 @@ function simularActividad(tipo) {
     }
 
     const cursorId = 'cursor-falso';
+
     if (tipo === "mouse") {
         let cursor = document.getElementById(cursorId);
         if (!cursor) {
@@ -142,46 +148,34 @@ function simularActividad(tipo) {
     }
 
     if (tipo === "click") {
-        const existingBtn = document.getElementById("boton-simulado");
+        const btn = document.createElement("button");
+        btn.id = "boton-simulado";
+        btn.textContent = "Refrescar y cerrar";
 
-        // Si ya existe, simplemente haz click en él
-        if (existingBtn) {
-            existingBtn.click();
-            console.log("🖱 Click simulado en botón existente");
-        } else {
-            // Crear un nuevo botón
-            const btn = document.createElement("button");
-            btn.id = "boton-simulado";
-            btn.textContent = "Botón Simulado";
+        Object.assign(btn.style, {
+            position: "fixed",
+            top: "20px",
+            left: "20px",
+            zIndex: 9999,
+            padding: "10px",
+            backgroundColor: "#4caf50",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+        });
 
-            Object.assign(btn.style, {
-                position: "fixed",
-                top: "20px",
-                left: "20px",
-                zIndex: 9999,
-                padding: "10px",
-                backgroundColor: "#2196f3",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer"
-            });
+        btn.addEventListener("click", () => {
+            localStorage.setItem("cerrarPestana", "true");
+            location.reload();
+        });
 
-            // Agrega comportamiento al botón (solo para efectos visuales)
-            btn.addEventListener("click", () => {
-                console.log("✅ Botón simulado fue clickeado");
-            });
-
-            document.body.appendChild(btn);
-
-            // Haz click en el botón luego de insertarlo
-            btn.click();
-            console.log("🆕 Botón creado y clickeado");
-        }
+        document.body.appendChild(btn);
+        console.log("🆕 Botón creado y clickeado");
+        btn.click();
     }
 
     if (tipo === "tecla") {
-        // Letras A-Z y números 0-9
         const caracteres = "abcdefghijklmnopqrstuvwxyz0123456789";
         const randomChar = caracteres[Math.floor(Math.random() * caracteres.length)];
 
@@ -198,3 +192,22 @@ function simularActividad(tipo) {
         console.log("⌨️ Tecla simulada:", randomChar);
     }
 }
+
+// Observa todas las pestañas por si hay que cerrarlas tras recargar
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === "complete" && tab.url?.startsWith("https://www.google.")) {
+        chrome.scripting.executeScript({
+            target: { tabId },
+            func: () => localStorage.getItem("cerrarPestana")
+        }, (results) => {
+            if (chrome.runtime.lastError || !results?.[0]?.result) return;
+
+            // Limpiar y cerrar la pestaña
+            chrome.scripting.executeScript({
+                target: { tabId },
+                func: () => localStorage.removeItem("cerrarPestana")
+            });
+            chrome.tabs.remove(tabId);
+        });
+    }
+});
